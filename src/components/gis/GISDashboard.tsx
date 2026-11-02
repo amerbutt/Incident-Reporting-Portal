@@ -49,11 +49,10 @@ export function GISDashboard({
   const [activeSubSectorFilter, setActiveSubSectorFilter] = useState<string | null>(null);
 
   // Sector D-12 Islamabad geographic bounds:
-  // Lat: 33.7230 to 33.7390, Long: 72.9530 to 72.9770
-  const minLat = 33.7230;
-  const maxLat = 33.7390;
-  const minLng = 72.9530;
-  const maxLng = 72.9770;
+  const minLat = 33.7050;
+  const maxLat = 33.7420;
+  const minLng = 72.9500;
+  const maxLng = 72.9780;
 
   // Filtered incidents for the map
   const displayIncidents = useMemo(() => {
@@ -77,8 +76,12 @@ export function GISDashboard({
 
   const getCategoryColor = (cat: IncidentCategory | string): string => {
     switch (cat) {
+      case 'Crime':
       case 'Security':
         return '#ef4444'; // Red
+      case 'Wildlife':
+        return '#14b8a6'; // Teal
+      case 'Hazards & Misc':
       case 'Safety':
         return '#f97316'; // Orange
       case 'Community':

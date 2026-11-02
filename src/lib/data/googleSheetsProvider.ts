@@ -185,24 +185,57 @@ export class GoogleSheetsDataProvider implements IIncidentDataProvider {
       .filter((inc): inc is Incident => inc !== null);
   }
 
-  // Robust CSV parser for published sheets
+  // Robust multi-line CSV parser for Google Sheets exports
   private parseCSVText(csv: string): Incident[] {
-    const lines = csv.split(/\r?\n/).filter(Boolean);
-    if (lines.length < 2) return [];
+    const rows: string[][] = [];
+    let row: string[] = [];
+    let current = '';
+    let inQuotes = false;
 
-    const headers = this.parseCSVLine(lines[0]);
+    for (let i = 0; i < csv.length; i++) {
+      const char = csv[i];
+      if (char === '"') {
+        if (inQuotes && csv[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === ',' && !inQuotes) {
+        row.push(current.trim());
+        current = '';
+      } else if ((char === '\r' || char === '\n') && !inQuotes) {
+        if (char === '\r' && csv[i + 1] === '\n') i++;
+        row.push(current.trim());
+        if (row.length > 1 || (row.length === 1 && row[0] !== '')) {
+          rows.push(row);
+        }
+        row = [];
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    if (current || row.length > 0) {
+      row.push(current.trim());
+      rows.push(row);
+    }
+
+    if (rows.length < 2) return [];
+
+    const headers = rows[0].map((h) => h.replace(/^["']|["']$/g, '').trim());
     const incidents: Incident[] = [];
 
-    for (let i = 1; i < lines.length; i++) {
-      const values = this.parseCSVLine(lines[i]);
-      if (values.length === 0) continue;
+    for (let i = 1; i < rows.length; i++) {
+      const values = rows[i];
+      if (values.length === 0 || (values.length === 1 && !values[0])) continue;
 
       const rowObj: Record<string, string> = {};
       headers.forEach((h, idx) => {
         rowObj[h] = values[idx] || '';
       });
 
-      const incident = this.mapRowToIncident(rowObj, `INC-${i}`);
+      const incident = this.mapRowToIncident(rowObj, `INC-${String(i).padStart(3, '0')}`);
       if (incident) {
         incidents.push(incident);
       }
@@ -211,38 +244,12 @@ export class GoogleSheetsDataProvider implements IIncidentDataProvider {
     return incidents;
   }
 
-  private parseCSVLine(line: string): string[] {
-    const result: string[] = [];
-    let current = '';
-    let inQuotes = false;
-
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        if (inQuotes && line[i + 1] === '"') {
-          current += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
-        }
-      } else if (char === ',' && !inQuotes) {
-        result.push(current.trim());
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    result.push(current.trim());
-    return result;
-  }
-
   // Map header keys cleanly to Incident model, capturing dynamic future columns
   private mapRowToIncident(row: Record<string, string>, fallbackId: string): Incident | null {
     // Normalization helper
     const getVal = (...keys: string[]): string => {
       for (const k of keys) {
         if (row[k] !== undefined && row[k] !== '') return row[k];
-        // Case-insensitive fallback
         const lowerKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');
         for (const actualKey of Object.keys(row)) {
           if (actualKey.toLowerCase().replace(/[^a-z0-9]/g, '') === lowerKey) {
@@ -253,19 +260,53 @@ export class GoogleSheetsDataProvider implements IIncidentDataProvider {
       return '';
     };
 
-    const fieldDate = getVal('FieldDate', 'Field Date', 'Date') || new Date().toISOString().split('T')[0];
-    const time = getVal('Time', 'Incident Time') || '12:00';
+    // 1. Normalize Date to YYYY-MM-DD
+    const rawDate = getVal('FieldDate', 'Field Date', 'Date') || new Date().toISOString().split('T')[0];
+    let fieldDate = rawDate;
+    if (rawDate.includes('/')) {
+      const parts = rawDate.split('/');
+      if (parts.length === 3) {
+        // Handle M/D/YYYY
+        const m = parts[0].padStart(2, '0');
+        const d = parts[1].padStart(2, '0');
+        const y = parts[2];
+        fieldDate = `${y}-${m}-${d}`;
+      }
+    }
+
+    // 2. Normalize Time
+    let time = getVal('Time', 'Incident Time') || '';
+    if (!time) {
+      const whatsapp = getVal('Incident Report (WhatsApp)', 'WhatsApp Report');
+      const timeMatch = whatsapp.match(/(\d{1,2}:\d{2})/);
+      if (timeMatch) {
+        time = timeMatch[1];
+      } else {
+        time = '19:00';
+      }
+    }
+
     const subSector = getVal('Sub-Sector', 'Sub Sector', 'Sector') || 'D-12';
-    const streetNo = getVal('Street No.', 'Street No', 'Street') || 'Street 1';
+    const address = getVal('Address', 'Location') || '';
+    let streetNo = getVal('Street No.', 'Street No', 'Street') || '';
+    if (!streetNo && address) {
+      const streetMatch = address.match(/(Street\s+[A-Za-z0-9\s]+?)(?:,|\s+Sector|\s+Islamabad|$)/i);
+      if (streetMatch) {
+        streetNo = streetMatch[1].trim();
+      } else {
+        streetNo = 'Main Sector Corridor';
+      }
+    }
+
     const houseNo = getVal('House No.', 'House No', 'House') || '';
     const incidentType = getVal('Incident Type', 'Type') || 'General Incident';
     const briefDescription = getVal('Brief Description', 'Description') || incidentType;
-    const authorities = getVal('Authorities', 'Authority') || 'Community Watch';
-    const mapLink = getVal('Map Link', 'Map', 'Link') || '';
-    const latLongRaw = getVal('Lat, Long', 'Lat,Long', 'Coordinates', 'Lat Long') || '33.7300, 72.9650';
+    const authorities = getVal('Authorities', 'Authority') || 'Security Team';
 
-    let latitude = 33.7300;
-    let longitude = 72.9650;
+    // 3. Normalize Lat, Long
+    const latLongRaw = getVal('Lat, Long', 'Lat,Long', 'Coordinates', 'Lat Long') || '33.7250, 72.9600';
+    let latitude = 33.7250;
+    let longitude = 72.9600;
     if (latLongRaw.includes(',')) {
       const parts = latLongRaw.split(',').map((p) => parseFloat(p.trim()));
       if (!isNaN(parts[0]) && !isNaN(parts[1])) {
@@ -274,35 +315,62 @@ export class GoogleSheetsDataProvider implements IIncidentDataProvider {
       }
     }
 
+    // 4. Map Link
+    let mapLink = getVal('Map Link', 'Map', 'Link') || '';
+    if (!mapLink.startsWith('http')) {
+      mapLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+    }
+
+    // 5. Status normalization
     const statusRaw = getVal('Status') || 'Open';
-    const status: IncidentStatus = ['Open', 'In Progress', 'Closed', 'Pending Authority'].includes(statusRaw)
-      ? (statusRaw as IncidentStatus)
-      : 'Open';
+    let status: IncidentStatus = 'Open';
+    const lowerStatus = statusRaw.toLowerCase();
+    if (lowerStatus.includes('resolved') || lowerStatus.includes('cleared') || lowerStatus.includes('closed')) {
+      status = 'Closed';
+    } else if (lowerStatus.includes('police') || lowerStatus.includes('handed') || lowerStatus.includes('progress')) {
+      status = 'In Progress';
+    } else if (lowerStatus.includes('pending') || lowerStatus.includes('waiting') || lowerStatus.includes('mediating')) {
+      status = 'Pending Authority';
+    } else {
+      status = 'Open';
+    }
 
     const incidentReportWhatsApp = getVal('Incident Report (WhatsApp)', 'WhatsApp Report', 'WhatsApp') || '';
     const transcriptUrdu = getVal('Transcript (Urdu)', 'Urdu Transcript', 'Transcript') || '';
-    const address = getVal('Address', 'Location') || `${houseNo ? houseNo + ', ' : ''}${streetNo}, ${subSector}, Islamabad`;
 
+    // 6. Category mapping
     const categoryRaw = getVal('Incident Category', 'Category') || 'Security';
-    const incidentCategory: IncidentCategory = [
-      'Security',
-      'Safety',
-      'Utilities',
-      'Community',
-      'Infrastructure',
-      'Traffic',
-      'Other',
-    ].includes(categoryRaw)
-      ? (categoryRaw as IncidentCategory)
-      : 'Security';
+    const incidentCategory: IncidentCategory = categoryRaw || 'Security';
 
-    const severityRaw = getVal('Incident Severity', 'Severity') || 'Medium';
-    const incidentSeverity: IncidentSeverity = ['Critical', 'High', 'Medium', 'Low'].includes(severityRaw)
-      ? (severityRaw as IncidentSeverity)
-      : 'Medium';
+    // 7. Incident Severity
+    let severityRaw = getVal('Incident Severity', 'Severity');
+    let incidentSeverity: IncidentSeverity = 'Medium';
+    if (severityRaw && ['Critical', 'High', 'Medium', 'Low'].includes(severityRaw)) {
+      incidentSeverity = severityRaw as IncidentSeverity;
+    } else {
+      // Intelligently infer severity from Category and Typology
+      const lowerType = incidentType.toLowerCase();
+      const lowerCat = categoryRaw.toLowerCase();
+      if (
+        lowerType.includes('snake') ||
+        lowerType.includes('theft') ||
+        lowerType.includes('robbery') ||
+        lowerType.includes('fire') ||
+        lowerType.includes('gas leak') ||
+        lowerType.includes('armed') ||
+        lowerCat === 'crime'
+      ) {
+        incidentSeverity = lowerType.includes('snake') || lowerType.includes('armed') ? 'Critical' : 'High';
+      } else if (lowerCat === 'traffic' || lowerCat === 'hazards & misc') {
+        incidentSeverity = 'Medium';
+      } else {
+        incidentSeverity = 'Low';
+      }
+    }
 
-    // Capture dynamic future columns
+    // 8. Capture dynamic future columns
     const standardKeys = new Set([
+      'date',
       'fielddate',
       'time',
       'subsector',
@@ -321,7 +389,9 @@ export class GoogleSheetsDataProvider implements IIncidentDataProvider {
       'incidentseverity',
     ]);
 
-    const customFields: Record<string, string> = {};
+    const customFields: Record<string, string> = {
+      OriginalStatus: statusRaw,
+    };
     for (const [k, v] of Object.entries(row)) {
       const cleanKey = k.toLowerCase().replace(/[^a-z0-9]/g, '');
       if (!standardKeys.has(cleanKey) && v.trim() !== '') {
@@ -346,10 +416,10 @@ export class GoogleSheetsDataProvider implements IIncidentDataProvider {
       status,
       incidentReportWhatsApp,
       transcriptUrdu,
-      address,
+      address: address || `${houseNo ? houseNo + ', ' : ''}${streetNo}, ${subSector}, Islamabad`,
       incidentCategory,
       incidentSeverity,
-      customFields: Object.keys(customFields).length > 0 ? customFields : undefined,
+      customFields,
     };
   }
 

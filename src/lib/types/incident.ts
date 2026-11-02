@@ -1,13 +1,17 @@
 // Complete schema for D12 Community Incident Intelligence Portal (IIP)
 
 export type IncidentCategory =
+  | 'Crime'
   | 'Security'
+  | 'Wildlife'
+  | 'Hazards & Misc'
   | 'Safety'
   | 'Utilities'
   | 'Community'
   | 'Infrastructure'
   | 'Traffic'
-  | 'Other';
+  | 'Other'
+  | string;
 
 export type IncidentSeverity = 'Critical' | 'High' | 'Medium' | 'Low';
 

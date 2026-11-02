@@ -320,25 +320,20 @@ export function calculateAreaRiskScores(incidents: Incident[]): AreaRiskScore[] 
 }
 
 export function calculateCategoryHierarchy(incidents: Incident[]): CategoryHierarchyNode[] {
-  const categoryColors: Record<IncidentCategory, string> = {
-    Security: '#ef4444', // Red
-    Safety: '#f97316', // Orange
-    Community: '#10b981', // Green
-    Utilities: '#3b82f6', // Blue
-    Infrastructure: '#8b5cf6', // Purple
-    Traffic: '#eab308', // Amber/Yellow
-    Other: '#64748b', // Slate
+  const categoryColors: Record<string, string> = {
+    Crime: '#ef4444',
+    Security: '#ef4444',
+    Wildlife: '#14b8a6',
+    'Hazards & Misc': '#f97316',
+    Safety: '#f97316',
+    Community: '#10b981',
+    Utilities: '#3b82f6',
+    Infrastructure: '#8b5cf6',
+    Traffic: '#eab308',
+    Other: '#64748b',
   };
 
-  const map: Record<IncidentCategory, { count: number; types: Record<string, number> }> = {
-    Security: { count: 0, types: {} },
-    Safety: { count: 0, types: {} },
-    Utilities: { count: 0, types: {} },
-    Community: { count: 0, types: {} },
-    Infrastructure: { count: 0, types: {} },
-    Traffic: { count: 0, types: {} },
-    Other: { count: 0, types: {} },
-  };
+  const map: Record<string, { count: number; types: Record<string, number> }> = {};
 
   incidents.forEach((inc) => {
     const cat = inc.incidentCategory || 'Other';
@@ -354,7 +349,7 @@ export function calculateCategoryHierarchy(incidents: Incident[]): CategoryHiera
     .map(([cat, data]) => ({
       category: cat as IncidentCategory,
       count: data.count,
-      color: categoryColors[cat as IncidentCategory] || '#3b82f6',
+      color: categoryColors[cat] || '#3b82f6',
       types: Object.entries(data.types)
         .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count),
