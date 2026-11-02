@@ -50,12 +50,19 @@ export function Header({
     { id: 'ai' as ActiveTab, label: 'AI Intelligence', icon: <Sparkles className="w-4 h-4 text-purple-400" /> },
   ];
 
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const formatSyncTime = (isoString: string) => {
+    if (!mounted) return 'Live Sync';
     try {
       const d = new Date(isoString);
       return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } catch {
-      return 'Just now';
+      return 'Live Sync';
     }
   };
 
@@ -96,7 +103,9 @@ export function Header({
               <span className="font-medium text-slate-400">Master:</span>
               <span className="text-slate-200 font-mono">Google Sheet</span>
               <span className="text-slate-500">•</span>
-              <span className="text-slate-400">{formatSyncTime(lastSyncedAt)}</span>
+              <span className="text-slate-400" suppressHydrationWarning>
+                {formatSyncTime(lastSyncedAt)}
+              </span>
             </div>
 
             {/* Sync Now Button */}

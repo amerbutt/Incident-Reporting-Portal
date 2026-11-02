@@ -50,11 +50,17 @@ export default function IncidentIntelligencePortal() {
     searchQuery: '',
   });
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Data State
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [kpis, setKpis] = useState<KPISummary | null>(null);
   const [dataSource, setDataSource] = useState<string>('google_sheets');
-  const [lastSyncedAt, setLastSyncedAt] = useState<string>(new Date().toISOString());
+  const [lastSyncedAt, setLastSyncedAt] = useState<string>('2026-11-02T16:00:00.000Z');
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [facets, setFacets] = useState<{
@@ -245,6 +251,34 @@ export default function IncidentIntelligencePortal() {
       customEndDate: dateStr,
     }));
   };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col bg-grid-pattern">
+        <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 p-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-600/30 flex items-center justify-center border border-blue-500/40">
+                <Shield className="w-6 h-6 text-blue-400" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-white">D12 Incident Intelligence Portal</div>
+                <div className="text-xs text-slate-400">Sector D-12, Islamabad • Live Google Sheet Master</div>
+              </div>
+            </div>
+            <div className="text-xs text-slate-400 font-mono flex items-center gap-2">
+              <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+              Loading Master Data...
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-24 flex flex-col items-center justify-center space-y-3">
+          <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
+          <p className="text-xs text-slate-400 font-mono">Initializing Intelligence Dashboards & GIS Engine...</p>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col bg-grid-pattern">

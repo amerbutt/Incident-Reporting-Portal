@@ -178,7 +178,7 @@ export function ReportCenter({
 
               <div className="text-right text-xs font-mono text-slate-400">
                 <span className="block font-bold text-slate-200">CONFIDENTIAL</span>
-                <span>Date: {new Date().toLocaleDateString('en-US')}</span>
+                <span suppressHydrationWarning>Date: {new Date().toLocaleDateString('en-US')}</span>
               </div>
             </div>
 
