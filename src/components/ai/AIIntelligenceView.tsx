@@ -15,7 +15,6 @@ import {
   Clock,
   FileText,
   Target,
-  ArrowRight,
 } from 'lucide-react';
 
 interface AIIntelligenceViewProps {
@@ -81,7 +80,7 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
 
   const handleCopy = () => {
     if (!report) return;
-    const text = `D-12 INCIDENT INTELLIGENCE EXECUTIVE BRIEF\nPeriod: ${report.reportingPeriod}\n\nEXECUTIVE SUMMARY:\n${report.executiveSummary}\n\nKEY FINDINGS:\n${report.keyFindings.map((f) => `• ${f}`).join('\n')}\n\nRECOMMENDATIONS:\n${report.recommendations.map((r) => `• ${r}`).join('\n')}`;
+    const text = `SECTOR D-12 COMMUNITY INCIDENT INTELLIGENCE EXECUTIVE BRIEF\nPeriod: ${report.reportingPeriod}\n\nEXECUTIVE SUMMARY:\n${report.executiveSummary}\n\nKEY FINDINGS:\n${report.keyFindings.map((f) => `• ${f}`).join('\n')}\n\nRECOMMENDATIONS:\n${report.recommendations.map((r) => `• ${r}`).join('\n')}`;
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -90,21 +89,21 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Top Banner */}
-      <div className="glass-panel p-6 rounded-2xl border border-purple-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
+      <div className="glass-panel p-6 rounded-2xl border border-purple-300 dark:border-purple-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden shadow-sm">
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-1">
-            <span className="p-1 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
+            <span className="p-1 rounded-lg bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-500/30">
               <Sparkles className="w-4 h-4" />
             </span>
-            <span className="text-xs uppercase font-bold text-purple-400 tracking-wider">
+            <span className="text-xs uppercase font-bold text-purple-700 dark:text-purple-400 tracking-wider">
               Autonomous Intelligence Engine
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-white">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
             Sector D-12 AI Incident Briefing
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Synthesizes trends, temporal spikes, corridor vulnerabilities, and authority response bottlenecks into actionable briefings.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Synthesizes trends, temporal spikes, street vulnerabilities, and authority response patterns into actionable briefings for Sector D-12 residents.
           </p>
         </div>
 
@@ -113,7 +112,7 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
             variant="glass"
             size="sm"
             onClick={handleCopy}
-            icon={copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            icon={copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
           >
             {copied ? 'Copied' : 'Copy Brief'}
           </Button>
@@ -131,17 +130,17 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
       </div>
 
       {loading && !report && (
-        <div className="glass-panel p-16 rounded-2xl border border-slate-800 text-center space-y-3">
-          <RefreshCw className="w-8 h-8 text-purple-400 animate-spin mx-auto" />
-          <h3 className="text-base font-bold text-white">Synthesizing Incident Data</h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
+        <div className="glass-panel p-16 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-3">
+          <RefreshCw className="w-8 h-8 text-purple-600 dark:text-purple-400 animate-spin mx-auto" />
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Synthesizing Incident Data</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
             Computing temporal clustering, street vulnerability scores, and authority resolution metrics across Sector D-12...
           </p>
         </div>
       )}
 
       {error && (
-        <div className="glass-panel p-4 rounded-xl border border-rose-500/30 bg-rose-950/20 text-rose-300 text-xs">
+        <div className="glass-panel p-4 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-300 text-xs">
           <strong>Synthesis Notice:</strong> {error}
         </div>
       )}
@@ -149,17 +148,17 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
       {report && (
         <div className="space-y-6">
           {/* Executive Summary Card */}
-          <div className="glass-panel p-6 rounded-2xl border border-blue-500/30 relative">
-            <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-              <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-2">
+          <div className="glass-panel p-6 rounded-2xl border border-blue-200 dark:border-blue-500/30 relative shadow-sm">
+            <div className="flex items-center justify-between mb-3 border-b border-slate-200 dark:border-slate-800 pb-2">
+              <h3 className="text-xs font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
                 <FileText className="w-4 h-4" />
-                Executive Summary
+                Community Executive Summary
               </h3>
-              <span className="text-[11px] font-mono text-slate-400">
+              <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                 Period: {report.reportingPeriod} • {report.totalAnalyzed} Cases
               </span>
             </div>
-            <p className="text-sm sm:text-base leading-relaxed text-slate-100 font-sans">
+            <p className="text-sm sm:text-base leading-relaxed text-slate-800 dark:text-slate-100 font-sans">
               {report.executiveSummary}
             </p>
           </div>
@@ -167,15 +166,15 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
           {/* 2-Column: Key Findings & Major Trends */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Key Findings */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-emerald-400 flex items-center gap-2">
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+              <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" />
                 Key Analytical Findings
               </h3>
               <div className="space-y-2.5">
                 {report.keyFindings.map((finding, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 mt-1.5" />
+                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
                     <span className="leading-relaxed">{finding}</span>
                   </div>
                 ))}
@@ -183,15 +182,15 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
             </div>
 
             {/* Major Trends */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-cyan-400 flex items-center gap-2">
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+              <h3 className="text-sm font-bold text-cyan-700 dark:text-cyan-400 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
                 Major Temporal & Spatial Trends
               </h3>
               <div className="space-y-2.5">
                 {report.majorTrends.map((trend, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0 mt-1.5" />
+                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0 mt-1.5" />
                     <span className="leading-relaxed">{trend}</span>
                   </div>
                 ))}
@@ -202,8 +201,8 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
           {/* 2-Column: Risk Areas & Emerging Concerns */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Top Risk Areas */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-rose-400 flex items-center gap-2">
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+              <h3 className="text-sm font-bold text-rose-700 dark:text-rose-400 flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 High Vulnerability Risk Corridors
               </h3>
@@ -211,19 +210,19 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
                 {report.topRiskAreas.map((area) => (
                   <div
                     key={area.name}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/70 border border-slate-850"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-850"
                   >
                     <div>
-                      <span className="font-bold text-white text-xs">{area.name}</span>
-                      <span className="text-[11px] text-slate-400 block">
+                      <span className="font-bold text-slate-900 dark:text-white text-xs">{area.name}</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
                         Focus: {area.primaryConcern} ({area.incidentCount} cases)
                       </span>
                     </div>
                     <span
-                      className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${
+                      className={`px-2 py-0.5 rounded-md text-xs font-mono font-bold ${
                         area.level === 'High'
-                          ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                          : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30'
+                          : 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30'
                       }`}
                     >
                       Score {area.score}
@@ -234,15 +233,15 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
             </div>
 
             {/* Emerging Concerns */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-amber-400 flex items-center gap-2">
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+              <h3 className="text-sm font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" />
                 Emerging Operational Concerns
               </h3>
               <div className="space-y-2.5">
                 {report.emergingConcerns.map((concern, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-200">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5" />
+                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
                     <span className="leading-relaxed">{concern}</span>
                   </div>
                 ))}
@@ -253,15 +252,15 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
           {/* Recommendations & Management Action Plan */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Strategic Recommendations */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-purple-400 flex items-center gap-2">
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+              <h3 className="text-sm font-bold text-purple-700 dark:text-purple-400 flex items-center gap-2">
                 <Target className="w-4 h-4" />
                 Strategic AI Recommendations
               </h3>
               <div className="space-y-2.5">
                 {report.recommendations.map((rec, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-200">
-                    <span className="font-bold text-purple-400 font-mono text-xs shrink-0">
+                  <div key={idx} className="flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-200">
+                    <span className="font-bold text-purple-700 dark:text-purple-400 font-mono text-xs shrink-0">
                       #{idx + 1}
                     </span>
                     <span className="leading-relaxed">{rec}</span>
@@ -271,23 +270,23 @@ export function AIIntelligenceView({ filters, onUpdateFilters }: AIIntelligenceV
             </div>
 
             {/* Prioritized Management Actions */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
-              <h3 className="text-sm font-bold text-blue-400 flex items-center gap-2">
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+              <h3 className="text-sm font-bold text-blue-700 dark:text-blue-400 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" />
-                Management Action Directive Plan
+                Community Action Directives
               </h3>
               <div className="space-y-2">
                 {report.managementActions.map((item, idx) => (
                   <div
                     key={idx}
-                    className="p-2.5 rounded-lg bg-slate-950/70 border border-slate-850 space-y-1"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-850 space-y-1"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded uppercase font-mono bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded uppercase font-mono bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
                         {item.priority}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-200 leading-relaxed">{item.action}</p>
+                    <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">{item.action}</p>
                   </div>
                 ))}
               </div>

@@ -221,7 +221,7 @@ export function calculateDayOfWeekDistribution(incidents: Incident[]): DayOfWeek
 
 export function calculateAuthorityStats(incidents: Incident[]): AuthorityStat[] {
   const map: Record<string, { total: number; open: number; closed: number }> = {};
-  const knownAuthorities = ['Police', 'Rescue 1122', 'CDA', 'Gas Company', 'Electricity Company', 'D-12 Security Watch'];
+  const knownAuthorities = ['Police', 'Rescue 1122', 'CDA', 'Gas Company', 'Electricity Company', 'D12 Security Committee'];
 
   knownAuthorities.forEach((auth) => {
     map[auth] = { total: 0, open: 0, closed: 0 };
@@ -231,7 +231,14 @@ export function calculateAuthorityStats(incidents: Incident[]): AuthorityStat[] 
     const rawAuth = inc.authorities;
     let matchedAny = false;
     knownAuthorities.forEach((known) => {
-      if (rawAuth.toLowerCase().includes(known.toLowerCase())) {
+      const isCommitteeMatch =
+        known === 'D12 Security Committee' &&
+        (rawAuth.toLowerCase().includes('security watch') ||
+          rawAuth.toLowerCase().includes('citizen watch') ||
+          rawAuth.toLowerCase().includes('security committee') ||
+          rawAuth.toLowerCase().includes('security team'));
+
+      if (rawAuth.toLowerCase().includes(known.toLowerCase()) || isCommitteeMatch) {
         matchedAny = true;
         map[known].total++;
         if (inc.status === 'Closed') map[known].closed++;

@@ -1,17 +1,18 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export const metadata: Metadata = {
-  title: 'D12 Community Incident Intelligence Portal (IIP) | Islamabad',
+  title: 'D-12 Community Incident Intelligence Portal | D12 Security Committee',
   description:
-    'Production-ready Community Incident Intelligence Portal for Sector D-12, Islamabad. Live Google Sheet master sync, interactive GIS mapping, calendar matrix, executive dashboards, and AI report generation.',
+    'Dedicated Community Incident Intelligence Portal for Sector D-12, Islamabad. Managed by the D12 Security Committee with live master Google Sheet synchronization, street-level hotspot analytics, and single-page executive intelligence reports.',
   keywords: [
     'D12 Incident Portal',
-    'Sector D-12 Islamabad',
-    'Capital Development Authority',
-    'GIS Incident Mapping',
-    'Community Watch',
-    'Executive Incident Intelligence',
+    'D12 Security Committee',
+    'Sector D-12 Security Committee',
+    'D12 Street Hotspots',
+    'D-12 Islamabad Incidents',
+    'Community Intelligence Portal',
   ],
 };
 
@@ -30,8 +31,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white" suppressHydrationWarning>
-        {children}
+      <body className="min-h-full flex flex-col bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 selection:bg-blue-600 selection:text-white transition-colors duration-200" suppressHydrationWarning>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

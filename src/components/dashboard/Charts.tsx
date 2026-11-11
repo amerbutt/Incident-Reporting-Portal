@@ -15,7 +15,7 @@ export function DailyTrendChart({ data }: { data: TimeSeriesPoint[] }) {
   const height = 220;
   const padding = { top: 20, right: 20, bottom: 30, left: 35 };
 
-  const maxVal = Math.max(...data.map((d) => d.count), 5);
+  const maxVal = Math.max(5, ...data.map((d) => (typeof d?.count === 'number' && !Number.isNaN(d.count) ? d.count : 0)));
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
@@ -52,10 +52,11 @@ export function DailyTrendChart({ data }: { data: TimeSeriesPoint[] }) {
                 y1={y}
                 x2={width - padding.right}
                 y2={y}
-                stroke="#1e293b"
+                stroke="currentColor"
+                className="text-slate-200 dark:text-slate-800"
                 strokeDasharray="4 4"
               />
-              <text x={padding.left - 8} y={y + 3} textAnchor="end" fill="#64748b" fontSize="10">
+              <text x={padding.left - 8} y={y + 3} textAnchor="end" fill="currentColor" className="text-slate-400 dark:text-slate-500 text-[10px]">
                 {val}
               </text>
             </g>
@@ -66,7 +67,7 @@ export function DailyTrendChart({ data }: { data: TimeSeriesPoint[] }) {
         <path d={areaD} fill="url(#trendGradient)" />
 
         {/* Trend Line */}
-        <path d={pathD} fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" />
+        <path d={pathD} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" />
 
         {/* Data points */}
         {points.map((p, idx) => (
@@ -76,9 +77,9 @@ export function DailyTrendChart({ data }: { data: TimeSeriesPoint[] }) {
             cy={p.y}
             r={hoverIndex === idx ? 5 : 3}
             fill={hoverIndex === idx ? '#60a5fa' : '#3b82f6'}
-            stroke="#0f172a"
-            strokeWidth="2"
-            className="cursor-pointer transition-all"
+            stroke="#ffffff"
+            strokeWidth="1.5"
+            className="cursor-pointer transition-all dark:stroke-slate-900"
             onMouseEnter={() => setHoverIndex(idx)}
             onMouseLeave={() => setHoverIndex(null)}
           />
@@ -93,8 +94,8 @@ export function DailyTrendChart({ data }: { data: TimeSeriesPoint[] }) {
               x={p.x}
               y={height - 8}
               textAnchor="middle"
-              fill="#94a3b8"
-              fontSize="10"
+              fill="currentColor"
+              className="text-slate-500 dark:text-slate-400 text-[10px]"
               fontFamily="sans-serif"
             >
               {p.date}
@@ -105,7 +106,7 @@ export function DailyTrendChart({ data }: { data: TimeSeriesPoint[] }) {
       {/* Tooltip */}
       {hoverIndex !== null && points[hoverIndex] && (
         <div
-          className="absolute z-10 pointer-events-none bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg shadow-xl text-xs"
+          className="absolute z-10 pointer-events-none bg-slate-900 border border-slate-700 text-white px-3 py-1.5 rounded-lg shadow-xl text-xs"
           style={{
             left: `${(points[hoverIndex].x / width) * 100}%`,
             top: `${(points[hoverIndex].y / height) * 100}%`,
@@ -125,16 +126,16 @@ export function DailyTrendChart({ data }: { data: TimeSeriesPoint[] }) {
 
 // 2. Hourly Distribution Histogram (0 - 23h)
 export function HourlyDistributionChart({ data }: { data: HourlyDistribution[] }) {
-  const maxCount = Math.max(...data.map((d) => d.count), 1);
+  const maxCount = Math.max(1, ...data.map((d) => (typeof d?.count === 'number' && !Number.isNaN(d.count) ? d.count : 0)));
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
         <span>12 AM (Midnight)</span>
-        <span className="text-amber-400 font-medium">8 PM – 11 PM (Critical Evening Surge)</span>
+        <span className="text-amber-600 dark:text-amber-400 font-bold">8 PM – 11 PM (Critical Evening Surge)</span>
         <span>11 PM</span>
       </div>
-      <div className="flex items-end gap-1 h-36 pt-4 px-1 bg-slate-950/40 rounded-lg border border-slate-800/80">
+      <div className="flex items-end gap-1 h-36 pt-4 px-1 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-200 dark:border-slate-800/80">
         {data.map((item) => {
           const heightPct = Math.max(6, Math.round((item.count / maxCount) * 100));
           const isPeakEvening = item.hour >= 20 && item.hour <= 23;
@@ -165,7 +166,7 @@ export function HourlyDistributionChart({ data }: { data: HourlyDistribution[] }
           );
         })}
       </div>
-      <div className="flex justify-between text-[10px] text-slate-500 px-1 font-mono">
+      <div className="flex justify-between text-[10px] text-slate-400 dark:text-slate-500 px-1 font-mono">
         <span>00h</span>
         <span>06h</span>
         <span>12h</span>
@@ -178,17 +179,17 @@ export function HourlyDistributionChart({ data }: { data: HourlyDistribution[] }
 
 // 3. Day of Week Chart
 export function DayOfWeekChart({ data }: { data: DayOfWeekDistribution[] }) {
-  const maxCount = Math.max(...data.map((d) => d.count), 1);
+  const maxCount = Math.max(1, ...data.map((d) => (typeof d?.count === 'number' && !Number.isNaN(d.count) ? d.count : 0)));
 
   return (
-    <div className="grid grid-cols-7 gap-2 h-36 items-end pt-4 bg-slate-950/40 p-3 rounded-lg border border-slate-800/80">
+    <div className="grid grid-cols-7 gap-2 h-36 items-end pt-4 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-200 dark:border-slate-800/80">
       {data.map((item) => {
         const heightPct = Math.max(10, Math.round((item.count / maxCount) * 100));
         const isWeekend = item.dayName === 'Sat' || item.dayName === 'Sun';
 
         return (
           <div key={item.dayName} className="group flex flex-col items-center h-full justify-end">
-            <div className="text-[11px] text-slate-300 font-mono mb-1 group-hover:text-blue-400">
+            <div className="text-[11px] text-slate-700 dark:text-slate-300 font-mono mb-1 group-hover:text-blue-500 font-bold">
               {item.count}
             </div>
             <div
@@ -196,10 +197,10 @@ export function DayOfWeekChart({ data }: { data: DayOfWeekDistribution[] }) {
               className={`w-full max-w-[28px] rounded-t transition-all ${
                 isWeekend
                   ? 'bg-gradient-to-t from-indigo-700 to-purple-500 group-hover:brightness-125'
-                  : 'bg-gradient-to-t from-blue-800 to-cyan-500 group-hover:brightness-125'
+                  : 'bg-gradient-to-t from-blue-700 to-cyan-500 group-hover:brightness-125'
               }`}
             />
-            <span className="text-xs text-slate-400 mt-2 font-medium">{item.dayName}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">{item.dayName}</span>
           </div>
         );
       })}
@@ -232,7 +233,8 @@ export function CategoryDonutChart({
             cy={size / 2}
             r={radius}
             fill="transparent"
-            stroke="#1e293b"
+            stroke="currentColor"
+            className="text-slate-200 dark:text-slate-800"
             strokeWidth={strokeWidth}
           />
           {categories.map((cat, idx) => {
@@ -252,33 +254,33 @@ export function CategoryDonutChart({
                 strokeWidth={strokeWidth}
                 strokeDasharray={strokeDasharray}
                 strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="transition-all duration-300 hover:opacity-80"
+                className="transition-all hover:opacity-80"
               />
             );
           })}
         </svg>
 
-        {/* Center count display */}
+        {/* Center label */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          <span className="text-2xl font-bold text-white font-mono">{total}</span>
-          <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Cases</span>
+          <span className="text-2xl font-bold font-mono text-slate-900 dark:text-white">{total}</span>
+          <span className="text-[10px] text-slate-500 uppercase tracking-wider">Reports</span>
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex-1 grid grid-cols-2 gap-2 text-xs w-full">
-        {categories.map((cat) => {
+      {/* Legend list */}
+      <div className="space-y-1.5 flex-1 w-full text-xs">
+        {categories.slice(0, 5).map((cat, idx) => {
           const pct = total > 0 ? Math.round((cat.count / total) * 100) : 0;
           return (
-            <div key={cat.category} className="flex items-center justify-between p-1.5 rounded bg-slate-900/50 border border-slate-800">
+            <div key={idx} className="flex items-center justify-between">
               <div className="flex items-center gap-2 truncate">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
-                <span className="text-slate-300 truncate">{cat.category}</span>
+                <span className="text-slate-700 dark:text-slate-300 truncate">{cat.category}</span>
               </div>
-              <span className="font-mono text-slate-400 shrink-0 ml-1">
-                {cat.count} <span className="text-[10px] text-slate-500">({pct}%)</span>
-              </span>
+              <div className="flex items-center gap-2 font-mono text-slate-500 dark:text-slate-400 shrink-0">
+                <span>{cat.count}</span>
+                <span className="text-[10px] w-8 text-right font-semibold">{pct}%</span>
+              </div>
             </div>
           );
         })}
@@ -289,28 +291,38 @@ export function CategoryDonutChart({
 
 // 5. Authority Workload Chart
 export function AuthorityWorkloadChart({ data }: { data: AuthorityStat[] }) {
-  const maxCount = Math.max(...data.map((d) => d.count), 1);
+  if (!data || data.length === 0) {
+    return <div className="text-center py-8 text-slate-500 text-xs">No authority data</div>;
+  }
+
+  const maxTotal = Math.max(1, ...data.map((d) => (typeof d?.count === 'number' && !Number.isNaN(d.count) ? d.count : 0)));
 
   return (
     <div className="space-y-3">
-      {data.map((item) => {
-        const widthPct = Math.round((item.count / maxCount) * 100);
+      {data.map((auth) => {
+        const clearanceRate = auth.count > 0 ? Math.round((auth.closedCount / auth.count) * 100) : 0;
+
         return (
-          <div key={item.authority} className="space-y-1">
+          <div key={auth.authority} className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-slate-200">{item.authority}</span>
-              <div className="flex items-center gap-2 font-mono text-slate-400">
-                <span className="text-emerald-400">{item.closedCount} resolved</span>
-                <span>•</span>
-                <span className="text-amber-400">{item.openCount} open</span>
-                <span>•</span>
-                <span className="font-bold text-white">{item.count} total</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">{auth.authority}</span>
+              <div className="flex items-center gap-3 font-mono text-xs">
+                <span className="text-slate-500 dark:text-slate-400">{auth.count} cases</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">{clearanceRate}% resolved</span>
               </div>
             </div>
-            <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden flex border border-slate-800">
+
+            {/* Progress Stack Bar */}
+            <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
               <div
-                style={{ width: `${widthPct}%` }}
-                className="bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 rounded-full"
+                style={{ width: `${clearanceRate}%` }}
+                className="bg-emerald-500 h-full rounded-l-full"
+                title={`Resolved: ${auth.closedCount}`}
+              />
+              <div
+                style={{ width: `${100 - clearanceRate}%` }}
+                className="bg-amber-500 h-full rounded-r-full"
+                title={`Pending: ${auth.openCount}`}
               />
             </div>
           </div>

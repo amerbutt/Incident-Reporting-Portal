@@ -9,6 +9,7 @@ export interface ColumnDef {
   label: string;
   visible: boolean;
   isCustom?: boolean;
+  locked?: boolean;
 }
 
 interface ColumnManagerModalProps {
@@ -29,6 +30,8 @@ export function ColumnManagerModal({
   if (!isOpen) return null;
 
   const toggleVisibility = (id: string) => {
+    const target = columns.find((c) => c.id === id);
+    if (target?.locked) return;
     const updated = columns.map((col) =>
       col.id === id ? { ...col, visible: !col.visible } : col
     );

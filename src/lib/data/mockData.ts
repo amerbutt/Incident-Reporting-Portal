@@ -10,7 +10,7 @@ export const INITIAL_MOCK_INCIDENTS: Incident[] = [
     houseNo: 'House 42',
     incidentType: 'Theft',
     briefDescription: 'Attempted break-in at residential property via rear boundary wall during power outage.',
-    authorities: 'Police, D-12 Security Watch',
+    authorities: 'Police, D12 Security Committee',
     mapLink: 'https://maps.google.com/?q=33.7312,72.9645',
     latLong: '33.7312, 72.9645',
     latitude: 33.7312,
@@ -158,7 +158,7 @@ export const INITIAL_MOCK_INCIDENTS: Incident[] = [
     houseNo: 'House 88',
     incidentType: 'Patrol Observation',
     briefDescription: 'Night security patrol intercepted 3 trespassers attempting to cut security fence along greenbelt.',
-    authorities: 'Police, D-12 Security Watch',
+    authorities: 'Police, D12 Security Committee',
     mapLink: 'https://maps.google.com/?q=33.7325,72.9630',
     latLong: '33.7325, 72.9630',
     latitude: 33.7325,
@@ -182,7 +182,7 @@ export const INITIAL_MOCK_INCIDENTS: Incident[] = [
     houseNo: 'House 29',
     incidentType: 'Trespassing',
     briefDescription: 'Unauthorized laborers from nearby construction site trespassing on vacant residential plot.',
-    authorities: 'CDA, D-12 Security Watch',
+    authorities: 'CDA, D12 Security Committee',
     mapLink: 'https://maps.google.com/?q=33.7292,72.9598',
     latLong: '33.7292, 72.9598',
     latitude: 33.7292,
@@ -399,7 +399,7 @@ export const INITIAL_MOCK_INCIDENTS: Incident[] = [
     houseNo: 'Corner Villa',
     incidentType: 'Patrol Observation',
     briefDescription: 'Security patrol noticed open main gate and unattended vehicle with engine idling for 25 minutes.',
-    authorities: 'D-12 Security Watch',
+    authorities: 'D12 Security Committee',
     mapLink: 'https://maps.google.com/?q=33.7370,72.9655',
     latLong: '33.7370, 72.9655',
     latitude: 33.7370,
@@ -495,7 +495,7 @@ export const INITIAL_MOCK_INCIDENTS: Incident[] = [
     houseNo: 'House 09',
     incidentType: 'Theft',
     briefDescription: 'Attempted burglary via kitchen window; triggered security alarm and fled on foot.',
-    authorities: 'Police, D-12 Security Watch',
+    authorities: 'Police, D12 Security Committee',
     mapLink: 'https://maps.google.com/?q=33.7305,72.9642',
     latLong: '33.7305, 72.9642',
     latitude: 33.7305,
@@ -567,7 +567,7 @@ export const INITIAL_MOCK_INCIDENTS: Incident[] = [
     houseNo: 'House 51',
     incidentType: 'Suspicious Activity',
     briefDescription: 'Two individuals taking photographs of residential security camera positions.',
-    authorities: 'Police, D-12 Security Watch',
+    authorities: 'Police, D12 Security Committee',
     mapLink: 'https://maps.google.com/?q=33.7315,72.9648',
     latLong: '33.7315, 72.9648',
     latitude: 33.7315,
@@ -663,7 +663,7 @@ export const INITIAL_MOCK_INCIDENTS: Incident[] = [
     houseNo: 'House 82',
     incidentType: 'Theft',
     briefDescription: 'Armed robbery foiled by community guard quick alarm response.',
-    authorities: 'Police, Rescue 1122, D-12 Security Watch',
+    authorities: 'Police, Rescue 1122, D12 Security Committee',
     mapLink: 'https://maps.google.com/?q=33.7283,72.9618',
     latLong: '33.7283, 72.9618',
     latitude: 33.7283,
@@ -722,7 +722,7 @@ export function getGeneratedIncidentDataset(): Incident[] {
   const categories: IncidentCategory[] = ['Security', 'Safety', 'Utilities', 'Community', 'Infrastructure', 'Traffic', 'Other'];
   const severities: IncidentSeverity[] = ['Critical', 'High', 'Medium', 'Low'];
   const statuses: IncidentStatus[] = ['Closed', 'Open', 'In Progress', 'Pending Authority'];
-  const authoritiesList = ['Police', 'Rescue 1122', 'CDA', 'Gas Company', 'Electricity Company', 'D-12 Security Watch'];
+  const authoritiesList = ['Police', 'Rescue 1122', 'CDA', 'Gas Company', 'Electricity Company', 'D12 Security Committee'];
 
   // Base coords for D-12
   const baseLat = 33.7300;

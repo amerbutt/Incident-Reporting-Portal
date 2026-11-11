@@ -13,8 +13,7 @@ import {
 import { Header, ActiveTab } from '@/components/layout/Header';
 import { FilterBar } from '@/components/layout/FilterBar';
 import { FilterDrawer } from '@/components/layout/FilterDrawer';
-import { ExecutiveDashboard } from '@/components/dashboard/ExecutiveDashboard';
-import { GISDashboard } from '@/components/gis/GISDashboard';
+import { ExecutiveDashboard, ScorecardFilterType } from '@/components/dashboard/ExecutiveDashboard';
 import { CalendarDashboard } from '@/components/calendar/CalendarDashboard';
 import { IncidentRegister } from '@/components/register/IncidentRegister';
 import { IncidentDetailView } from '@/components/detail/IncidentDetailView';
@@ -36,6 +35,7 @@ export default function IncidentIntelligencePortal() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('executive');
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [activeScorecardFilter, setActiveScorecardFilter] = useState<ScorecardFilterType | null>(null);
 
   // Global Filter State (Synchronized across all modules)
   const [filters, setFilters] = useState<FilterState>({
@@ -60,7 +60,7 @@ export default function IncidentIntelligencePortal() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [kpis, setKpis] = useState<KPISummary | null>(null);
   const [dataSource, setDataSource] = useState<string>('google_sheets');
-  const [lastSyncedAt, setLastSyncedAt] = useState<string>('2026-11-02T16:00:00.000Z');
+  const [lastSyncedAt, setLastSyncedAt] = useState<string>('2026-11-06T10:00:00.000Z');
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [facets, setFacets] = useState<{
@@ -73,10 +73,10 @@ export default function IncidentIntelligencePortal() {
     statuses: IncidentStatus[];
   }>({
     subSectors: ['D-12/1', 'D-12/2', 'D-12/3', 'D-12/4'],
-    streets: ['Street 5', 'Street 7', 'Street 11', 'Street 15', 'Street 22', 'Main Double Road'],
-    categories: ['Security', 'Safety', 'Utilities', 'Community', 'Infrastructure', 'Traffic', 'Other'],
-    types: ['Theft', 'Suspicious Activity', 'Gas Leak', 'Water Shortage', 'Vehicle Incident', 'Patrol Observation'],
-    authorities: ['Police', 'Rescue 1122', 'CDA', 'Gas Company', 'Electricity Company', 'D-12 Security Watch'],
+    streets: ['Street 144', 'Street Major Road 4', 'Street 15', 'Street 7', 'Street 11'],
+    categories: ['Wildlife', 'Crime', 'Security', 'Hazards & Misc', 'Safety', 'Utilities', 'Community', 'Traffic'],
+    types: ['Wildlife (Snake)', 'Theft', 'Suspicious Activity', 'Gas Leak', 'Water Shortage'],
+    authorities: ['Police', 'Rescue 1122', 'Security Team', 'CDA', 'D12 Security Committee'],
     severities: ['Critical', 'High', 'Medium', 'Low'],
     statuses: ['Open', 'In Progress', 'Closed', 'Pending Authority'],
   });
@@ -192,6 +192,66 @@ export default function IncidentIntelligencePortal() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Scorecard click filter handler
+  const handleScorecardFilter = (type: ScorecardFilterType) => {
+    setActiveScorecardFilter(type);
+    if (type === 'all') {
+      setFilters((prev) => ({
+        ...prev,
+        categories: [],
+        severities: [],
+        statuses: [],
+        subSectors: [],
+        types: [],
+      }));
+    } else if (type === 'active') {
+      setFilters((prev) => ({
+        ...prev,
+        statuses: ['Open', 'In Progress'],
+      }));
+    } else if (type === 'critical') {
+      setFilters((prev) => ({
+        ...prev,
+        severities: ['Critical', 'High'],
+      }));
+    } else if (type === 'wildlife') {
+      setFilters((prev) => ({
+        ...prev,
+        categories: ['Wildlife'],
+      }));
+    } else if (type === 'crime') {
+      setFilters((prev) => ({
+        ...prev,
+        categories: ['Crime', 'Security'],
+      }));
+    } else if (type === 'hotspot') {
+      setFilters((prev) => ({
+        ...prev,
+        subSectors: ['D-12/3'],
+      }));
+    }
+
+    // Smooth scroll down to incident stream
+    setTimeout(() => {
+      const el = document.getElementById('incident-stream');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
+  const handleClearScorecardFilter = () => {
+    setActiveScorecardFilter(null);
+    setFilters((prev) => ({
+      ...prev,
+      categories: [],
+      severities: [],
+      statuses: [],
+      subSectors: [],
+      types: [],
+    }));
+  };
+
   // Next / Prev Incident in Detail View
   const currentIncidentIndex = useMemo(() => {
     if (!selectedIncident) return -1;
@@ -254,34 +314,34 @@ export default function IncidentIntelligencePortal() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col bg-grid-pattern">
-        <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 p-4">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 flex flex-col bg-grid-pattern">
+        <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 p-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/30 flex items-center justify-center border border-blue-500/40">
-                <Shield className="w-6 h-6 text-blue-400" />
+              <div className="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center border border-blue-500/30">
+                <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <div className="text-sm font-bold text-white">D12 Incident Intelligence Portal</div>
-                <div className="text-xs text-slate-400">Sector D-12, Islamabad • Live Google Sheet Master</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white">D-12 Community Incident Portal</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">Sector D-12 Resident Safety & Community Watch</div>
               </div>
             </div>
-            <div className="text-xs text-slate-400 font-mono flex items-center gap-2">
-              <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+            <div className="text-xs text-slate-500 font-mono flex items-center gap-2">
+              <RefreshCw className="w-3.5 h-3.5 text-blue-500 animate-spin" />
               Loading Master Data...
             </div>
           </div>
         </header>
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-24 flex flex-col items-center justify-center space-y-3">
-          <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
-          <p className="text-xs text-slate-400 font-mono">Initializing Intelligence Dashboards & GIS Engine...</p>
+          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">Initializing Sector D-12 Intelligence Repository...</p>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col bg-grid-pattern">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 flex flex-col bg-grid-pattern transition-colors duration-200">
       {/* 1. Header Component */}
       <Header
         activeTab={activeTab}
@@ -295,12 +355,14 @@ export default function IncidentIntelligencePortal() {
       />
 
       {/* 2. Global Filter Bar */}
-      <FilterBar
-        filters={filters}
-        onFilterChange={setFilters}
-        onOpenDrawer={() => setIsFilterDrawerOpen(true)}
-        totalFilteredCount={incidents.length}
-      />
+      <div className="no-print">
+        <FilterBar
+          filters={filters}
+          onFilterChange={setFilters}
+          onOpenDrawer={() => setIsFilterDrawerOpen(true)}
+          totalFilteredCount={incidents.length}
+        />
+      </div>
 
       {/* 3. Global Filter Drawer */}
       <FilterDrawer
@@ -316,7 +378,7 @@ export default function IncidentIntelligencePortal() {
         {isLoading && incidents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-4">
             <RefreshCw className="w-10 h-10 text-blue-500 animate-spin" />
-            <p className="text-sm text-slate-400 font-mono">
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-mono">
               Loading Sector D-12 Incident Intelligence Repository...
             </p>
           </div>
@@ -333,31 +395,22 @@ export default function IncidentIntelligencePortal() {
                 authorities={authorityStats}
                 riskScores={riskScores}
                 categories={categoryHierarchy}
+                activeFilterType={activeScorecardFilter}
+                onFilterScorecard={handleScorecardFilter}
+                onClearScorecardFilter={handleClearScorecardFilter}
                 onSelectIncident={handleSelectIncident}
                 onFilterStreet={handleFilterStreet}
               />
             )}
 
-            {/* MODULE 2: GIS MAPPING DASHBOARD */}
-            {activeTab === 'gis' && (
-              <GISDashboard
-                incidents={incidents}
-                categories={categoryHierarchy}
-                riskScores={riskScores}
-                onViewDetails={handleSelectIncident}
-                onFilterCategory={handleFilterCategoryTree}
-                selectedCategory={filters.categories.length === 1 ? filters.categories[0] : null}
-                selectedType={filters.types.length === 1 ? filters.types[0] : null}
-              />
-            )}
-
-            {/* MODULE 3: CALENDAR INTELLIGENCE DASHBOARD */}
+            {/* MODULE 2: CALENDAR INTELLIGENCE DASHBOARD */}
             {activeTab === 'calendar' && (
               <CalendarDashboard
                 incidents={incidents}
                 onFilterDate={handleFilterCalendarDate}
                 onFilterType={handleFilterCalendarType}
                 onFilterCell={handleFilterCalendarCell}
+                onSelectIncident={handleSelectIncident}
               />
             )}
 
@@ -381,7 +434,7 @@ export default function IncidentIntelligencePortal() {
               />
             )}
 
-            {/* MODULE 6: REPORT GENERATION CENTER */}
+            {/* MODULE 6: REPORT GENERATION CENTER (1-PAGE REPORT) */}
             {activeTab === 'reports' && (
               <ReportCenter
                 incidents={incidents}
@@ -403,21 +456,21 @@ export default function IncidentIntelligencePortal() {
       </main>
 
       {/* 5. Executive Command Center Footer */}
-      <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/80 py-5 text-xs text-slate-400">
+      <footer className="mt-auto border-t border-slate-200 dark:border-slate-800/80 bg-white/80 dark:bg-slate-950/80 py-5 text-xs text-slate-500 dark:text-slate-400 no-print">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-blue-500" />
-            <span className="font-semibold text-slate-300">
-              D12 Community Incident Intelligence Portal (IIP)
+            <Shield className="w-4 h-4 text-blue-600 dark:text-blue-500" />
+            <span className="font-semibold text-slate-800 dark:text-slate-300">
+              Sector D-12 Community Incident Intelligence Portal
             </span>
-            <span className="text-slate-600">|</span>
-            <span>Production Vercel Ready</span>
+            <span className="text-slate-400 dark:text-slate-600">|</span>
+            <span className="font-medium text-blue-600 dark:text-blue-400">D12 Security Committee</span>
           </div>
 
-          <div className="flex items-center gap-4 text-[11px] font-mono text-slate-400">
+          <div className="flex items-center gap-4 text-[11px] font-mono text-slate-500 dark:text-slate-400">
             <span>Sector D-12, Islamabad</span>
             <span>Master: Google Sheets API v4</span>
-            <span className="text-emerald-400">● Live Synchronization Active</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">● Live Sync Active</span>
           </div>
         </div>
       </footer>
