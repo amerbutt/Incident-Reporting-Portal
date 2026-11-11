@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useTheme } from '@/context/ThemeContext';
+import { PWARegister } from '@/components/pwa/PWARegister';
 
 export type ActiveTab = 'executive' | 'calendar' | 'register' | 'details' | 'reports' | 'ai';
 
@@ -120,6 +121,9 @@ export function Header({
             >
               {isSyncing ? 'Syncing...' : 'Sync Sheet'}
             </Button>
+
+            {/* PWA Install Button (Mobile & Desktop) */}
+            <PWARegister />
 
             {/* Explicit Light / Dark Mode Segmented Switch */}
             <div className="flex items-center rounded-xl p-0.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs shadow-sm">
